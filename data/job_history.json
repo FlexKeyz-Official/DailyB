@@ -46,5 +46,25 @@
     "success": true,
     "error_message": null,
     "response_content": "<html><body><script type=\"text/javascript\" src=\"/aes.js\" ></script><script>function toNumbers(d){var e=[];d.replace(/(..)/g,function(d){e.push(parseInt(d,16))});return e}function toHex(){for(var d=[],d=1==arguments.length&&arguments[0].constructor==Array?arguments[0]:arguments,e=\"\",f=0;f<d.length;f++)e+=(16>d[f]?\"0\":\"\")+d[f].toString(16);return e.toLowerCase()}var a=toNumbers(\"f655ba9d09a112d4968c63579db590b4\"),b=toNumbers(\"98344c2eee86c3994890592585b49f80\"),c=toNumbers(\"a0e38378b4584b7776cc0013d8799c74\");document.cookie=\"__test=\"+toHex(slowAES.decrypt(c,2,a,b))+\"; max-age=21600; expires=Thu, 31-Dec-37 23:55:55 GMT; path=/\"; location.href=\"https://dailybred.ct.ws/crons/cron_earnings.php?token=adminFlex01&i=1\";</script><noscript>This site requires Javascript to work, please enable Javascript in your browser or use a browser with Javascript support</noscript></body></html>"
+  },
+  {
+    "id": "f483e78a-3b0c-4066-92d2-9516c4266e9c",
+    "job_id": "09ca70b1-cafe-46fd-b421-6b5cf5676ea1",
+    "timestamp": "2025-09-03T13:14:31.826018",
+    "status_code": 200,
+    "execution_time": 0.441,
+    "success": true,
+    "error_message": null,
+    "response_content": "<html><body><script type=\"text/javascript\" src=\"/aes.js\" ></script><script>function toNumbers(d){var e=[];d.replace(/(..)/g,function(d){e.push(parseInt(d,16))});return e}function toHex(){for(var d=[],d=1==arguments.length&&arguments[0].constructor==Array?arguments[0]:arguments,e=\"\",f=0;f<d.length;f++)e+=(16>d[f]?\"0\":\"\")+d[f].toString(16);return e.toLowerCase()}var a=toNumbers(\"f655ba9d09a112d4968c63579db590b4\"),b=toNumbers(\"98344c2eee86c3994890592585b49f80\"),c=toNumbers(\"8aefa623d66061e89861bf5d836deb90\");document.cookie=\"__test=\"+toHex(slowAES.decrypt(c,2,a,b))+\"; max-age=21600; expires=Thu, 31-Dec-37 23:55:55 GMT; path=/\"; location.href=\"https://dailybred.ct.ws/crons/cron_earnings.php?token=adminFlex01&i=2\";</script><noscript>This site requires Javascript to work, please enable Javascript in your browser or use a browser with Javascript support</noscript></body></html>"
+  },
+  {
+    "id": "1959f543-d959-44f4-903a-458c40fd485c",
+    "job_id": "09ca70b1-cafe-46fd-b421-6b5cf5676ea1",
+    "timestamp": "2025-09-03T13:14:32.619811",
+    "status_code": 200,
+    "execution_time": 0.435,
+    "success": true,
+    "error_message": null,
+    "response_content": "<html><body><script type=\"text/javascript\" src=\"/aes.js\" ></script><script>function toNumbers(d){var e=[];d.replace(/(..)/g,function(d){e.push(parseInt(d,16))});return e}function toHex(){for(var d=[],d=1==arguments.length&&arguments[0].constructor==Array?arguments[0]:arguments,e=\"\",f=0;f<d.length;f++)e+=(16>d[f]?\"0\":\"\")+d[f].toString(16);return e.toLowerCase()}var a=toNumbers(\"f655ba9d09a112d4968c63579db590b4\"),b=toNumbers(\"98344c2eee86c3994890592585b49f80\"),c=toNumbers(\"8aefa623d66061e89861bf5d836deb90\");document.cookie=\"__test=\"+toHex(slowAES.decrypt(c,2,a,b))+\"; max-age=21600; expires=Thu, 31-Dec-37 23:55:55 GMT; path=/\"; location.href=\"https://dailybred.ct.ws/crons/cron_earnings.php?token=adminFlex01&i=2\";</script><noscript>This site requires Javascript to work, please enable Javascript in your browser or use a browser with Javascript support</noscript></body></html>"
   }
 ]

@@ -5,6 +5,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.executors.pool import ThreadPoolExecutor
 import json
+import re
+from urllib.parse import urlparse, parse_qs
 
 class CronScheduler:
     def __init__(self, job_manager):
@@ -100,6 +102,49 @@ class CronScheduler:
             self.logger.error(f"Failed to run job {job_id} immediately: {e}")
             return False
     
+    def _handle_infinityfree_protection(self, url, session, headers):
+        """Handle InfinityFree's anti-bot protection system"""
+        try:
+            # Make first request to get the protection page
+            response = session.get(url, headers=headers, timeout=30)
+            
+            # Check if we got the anti-bot protection page
+            if 'aes.js' in response.text and '__test=' in response.text:
+                self.logger.info("Detected InfinityFree anti-bot protection, attempting to bypass...")
+                
+                # Extract the redirect URL from the JavaScript
+                redirect_match = re.search(r'location\.href="([^"]+)"', response.text)
+                if redirect_match:
+                    redirect_url = redirect_match.group(1)
+                    
+                    # The JavaScript sets a cookie, but we can try without it first
+                    # since the redirect URL contains the bypass parameter
+                    self.logger.info(f"Following redirect to: {redirect_url}")
+                    
+                    # Update headers to look more like a browser
+                    browser_headers = headers.copy()
+                    browser_headers.update({
+                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                        'Accept-Language': 'en-US,en;q=0.5',
+                        'Accept-Encoding': 'gzip, deflate',
+                        'DNT': '1',
+                        'Connection': 'keep-alive',
+                        'Upgrade-Insecure-Requests': '1',
+                    })
+                    
+                    # Make the second request to the bypass URL
+                    final_response = session.get(redirect_url, headers=browser_headers, timeout=30)
+                    return final_response
+                else:
+                    self.logger.warning("Could not extract redirect URL from protection page")
+            
+            # If no protection detected, return original response
+            return response
+            
+        except Exception as e:
+            self.logger.error(f"Error handling InfinityFree protection: {e}")
+            raise
+    
     def _execute_job(self, job_id):
         """Execute a job by making HTTP request"""
         start_time = datetime.now()
@@ -118,9 +163,12 @@ class CronScheduler:
             headers = job.get('headers', {})
             payload = job.get('payload')
             
-            # Set default headers
+            # Set browser-like headers to avoid anti-bot detection
             if 'User-Agent' not in headers:
-                headers['User-Agent'] = 'CronJobManager/1.0'
+                headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            
+            # Use session to handle cookies and redirects
+            session = requests.Session()
             
             # Prepare request kwargs
             request_kwargs = {
@@ -135,8 +183,13 @@ class CronScheduler:
                 else:
                     request_kwargs['data'] = payload
             
-            # Make the request
-            response = requests.request(method, url, **request_kwargs)
+            # Make the request, handling potential anti-bot protection
+            if method.upper() == 'GET':
+                # For GET requests, use our protection handler
+                response = self._handle_infinityfree_protection(url, session, headers)
+            else:
+                # For other methods, make direct request
+                response = session.request(method, url, **request_kwargs)
             
             # Calculate execution time
             execution_time = (datetime.now() - start_time).total_seconds()
