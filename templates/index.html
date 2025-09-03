@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Cron Job Manager{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2">
+                <i class="bi bi-speedometer2 me-2"></i>
+                Dashboard
+            </h1>
+            <a href="{{ url_for('add_job') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>
+                Add New Job
+            </a>
+        </div>
+
+        {% if jobs %}
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary">
+                        <div class="card-body text-center">
+                            <h3 class="card-title">{{ jobs|length }}</h3>
+                            <p class="card-text">Total Jobs</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success">
+                        <div class="card-body text-center">
+                            <h3 class="card-title">{{ jobs|selectattr('active')|list|length }}</h3>
+                            <p class="card-text">Active Jobs</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning">
+                        <div class="card-body text-center">
+                            <h3 class="card-title">{{ jobs|rejectattr('active')|list|length }}</h3>
+                            <p class="card-text">Inactive Jobs</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info">
+                        <div class="card-body text-center">
+                            <h3 class="card-title">{{ jobs|selectattr('is_running')|list|length }}</h3>
+                            <p class="card-text">Scheduled</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-list-task me-2"></i>
+                        Cron Jobs
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>URL</th>
+                                    <th>Schedule</th>
+                                    <th>Method</th>
+                                    <th>Status</th>
+                                    <th>Last Run</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for job in jobs %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ job.name }}</strong>
+                                        {% if job.is_running %}
+                                            <span class="badge bg-success ms-2">Scheduled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ job.url[:50] }}{% if job.url|length > 50 %}...{% endif %}</small>
+                                    </td>
+                                    <td>
+                                        <code class="text-info">{{ job.cron_expression }}</code>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if job.method == 'GET' %}secondary{% elif job.method == 'POST' %}primary{% else %}warning{% endif %}">
+                                            {{ job.method }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if job.active %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-play-fill me-1"></i>
+                                                Active
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-pause-fill me-1"></i>
+                                                Inactive
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if job.last_run %}
+                                            <small class="text-muted">
+                                                {{ moment(job.last_run).format('MMM DD, HH:mm') }}
+                                                {% if job.last_status == 'success' %}
+                                                    <i class="bi bi-check-circle text-success"></i>
+                                                {% else %}
+                                                    <i class="bi bi-x-circle text-danger"></i>
+                                                {% endif %}
+                                            </small>
+                                        {% else %}
+                                            <small class="text-muted">Never</small>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('run_job_now', job_id=job.id) }}" 
+                                               class="btn btn-outline-info" 
+                                               title="Run Now"
+                                               onclick="return confirm('Run this job now?')">
+                                                <i class="bi bi-play"></i>
+                                            </a>
+                                            <a href="{{ url_for('toggle_job', job_id=job.id) }}" 
+                                               class="btn btn-outline-{% if job.active %}warning{% else %}success{% endif %}" 
+                                               title="{% if job.active %}Deactivate{% else %}Activate{% endif %}"
+                                               onclick="return confirm('{% if job.active %}Deactivate{% else %}Activate{% endif %} this job?')">
+                                                <i class="bi bi-{% if job.active %}pause{% else %}play{% endif %}"></i>
+                                            </a>
+                                            <a href="{{ url_for('delete_job', job_id=job.id) }}" 
+                                               class="btn btn-outline-danger" 
+                                               title="Delete"
+                                               onclick="return confirm('Are you sure you want to delete this job? This action cannot be undone.')">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-clock-history text-muted" style="font-size: 4rem;"></i>
+                </div>
+                <h3 class="text-muted">No Cron Jobs Yet</h3>
+                <p class="text-muted mb-4">Get started by creating your first cron job to automate your tasks.</p>
+                <a href="{{ url_for('add_job') }}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-plus-circle me-2"></i>
+                    Create Your First Job
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh page every 30 seconds to show updated job statuses
+setTimeout(function() {
+    window.location.reload();
+}, 30000);
+</script>
+{% endblock %}

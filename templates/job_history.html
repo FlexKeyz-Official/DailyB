@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block title %}Job History - Cron Job Manager{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2">
+                <i class="bi bi-list-ul me-2"></i>
+                Job Execution History
+            </h1>
+            {% if history %}
+                <a href="{{ url_for('clear_history') }}" class="btn btn-outline-danger"
+                   onclick="return confirm('Are you sure you want to clear all history? This action cannot be undone.')">
+                    <i class="bi bi-trash me-1"></i>
+                    Clear History
+                </a>
+            {% endif %}
+        </div>
+
+        {% if history %}
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Job</th>
+                                    <th>Status</th>
+                                    <th>HTTP Code</th>
+                                    <th>Execution Time</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for entry in history %}
+                                <tr class="{% if not entry.success %}table-danger{% endif %}">
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ moment(entry.timestamp).format('MMM DD, YYYY HH:mm:ss') }}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ entry.job_name }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ entry.job_id[:8] }}...</small>
+                                    </td>
+                                    <td>
+                                        {% if entry.success %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle me-1"></i>
+                                                Success
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="bi bi-x-circle me-1"></i>
+                                                Failed
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if entry.status_code %}
+                                            <span class="badge bg-{% if entry.status_code < 300 %}success{% elif entry.status_code < 400 %}warning{% else %}danger{% endif %}">
+                                                {{ entry.status_code }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">{{ entry.execution_time }}s</span>
+                                    </td>
+                                    <td>
+                                        {% if entry.error_message %}
+                                            <button class="btn btn-sm btn-outline-danger" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#errorModal{{ loop.index }}"
+                                                    title="View Error">
+                                                <i class="bi bi-exclamation-triangle"></i>
+                                            </button>
+                                            
+                                            <!-- Error Modal -->
+                                            <div class="modal fade" id="errorModal{{ loop.index }}" tabindex="-1">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Error Details</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p><strong>Job:</strong> {{ entry.job_name }}</p>
+                                                            <p><strong>Timestamp:</strong> {{ moment(entry.timestamp).format('MMM DD, YYYY HH:mm:ss') }}</p>
+                                                            <p><strong>Error Message:</strong></p>
+                                                            <div class="alert alert-danger">
+                                                                <code>{{ entry.error_message }}</code>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Summary -->
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary">
+                        <div class="card-body text-center">
+                            <h4 class="card-title">{{ history|length }}</h4>
+                            <p class="card-text">Total Executions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success">
+                        <div class="card-body text-center">
+                            <h4 class="card-title">{{ history|selectattr('success')|list|length }}</h4>
+                            <p class="card-text">Successful</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-danger">
+                        <div class="card-body text-center">
+                            <h4 class="card-title">{{ history|rejectattr('success')|list|length }}</h4>
+                            <p class="card-text">Failed</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info">
+                        <div class="card-body text-center">
+                            <h4 class="card-title">
+                                {% if history|selectattr('success')|list|length > 0 %}
+                                    {{ ((history|selectattr('success')|list|length / history|length) * 100)|round(1) }}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            </h4>
+                            <p class="card-text">Success Rate</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-list-ul text-muted" style="font-size: 4rem;"></i>
+                </div>
+                <h3 class="text-muted">No Execution History</h3>
+                <p class="text-muted mb-4">Job execution history will appear here once your cron jobs start running.</p>
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Format timestamps using moment.js (if available) or fallback to native Date
+function moment(timestamp) {
+    const date = new Date(timestamp);
+    return {
+        format: function(format) {
+            // Simple format implementation
+            if (format === 'MMM DD, YYYY HH:mm:ss') {
+                return date.toLocaleString('en-US', {
+                    month: 'short',
+                    day: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+            }
+            return date.toLocaleString();
+        }
+    };
+}
+
+// Update timestamps on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // This is a placeholder for moment.js functionality
+    // The actual formatting is handled server-side for now
+});
+</script>
+{% endblock %}
