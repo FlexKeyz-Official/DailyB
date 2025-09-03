@@ -103,42 +103,56 @@ class CronScheduler:
             return False
     
     def _handle_infinityfree_protection(self, url, session, headers):
-        """Handle InfinityFree's anti-bot protection system"""
+        """Handle InfinityFree's multi-step anti-bot protection system"""
         try:
-            # Make first request to get the protection page
-            response = session.get(url, headers=headers, timeout=30)
+            # Update headers to look more like a browser
+            browser_headers = headers.copy()
+            browser_headers.update({
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate',
+                'DNT': '1',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1',
+            })
             
-            # Check if we got the anti-bot protection page
-            if 'aes.js' in response.text and '__test=' in response.text:
-                self.logger.info("Detected InfinityFree anti-bot protection, attempting to bypass...")
+            current_url = url
+            max_redirects = 10  # Prevent infinite loops
+            redirect_count = 0
+            response = None  # Initialize response variable
+            
+            while redirect_count < max_redirects:
+                # Make request to current URL
+                response = session.get(current_url, headers=browser_headers, timeout=30)
                 
-                # Extract the redirect URL from the JavaScript
-                redirect_match = re.search(r'location\.href="([^"]+)"', response.text)
-                if redirect_match:
-                    redirect_url = redirect_match.group(1)
+                # Check if we got the anti-bot protection page
+                if 'aes.js' in response.text and '__test=' in response.text:
+                    self.logger.info(f"Detected InfinityFree anti-bot protection (step {redirect_count + 1}), attempting to bypass...")
                     
-                    # The JavaScript sets a cookie, but we can try without it first
-                    # since the redirect URL contains the bypass parameter
-                    self.logger.info(f"Following redirect to: {redirect_url}")
-                    
-                    # Update headers to look more like a browser
-                    browser_headers = headers.copy()
-                    browser_headers.update({
-                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                        'Accept-Language': 'en-US,en;q=0.5',
-                        'Accept-Encoding': 'gzip, deflate',
-                        'DNT': '1',
-                        'Connection': 'keep-alive',
-                        'Upgrade-Insecure-Requests': '1',
-                    })
-                    
-                    # Make the second request to the bypass URL
-                    final_response = session.get(redirect_url, headers=browser_headers, timeout=30)
-                    return final_response
+                    # Extract the redirect URL from the JavaScript
+                    redirect_match = re.search(r'location\.href="([^"]+)"', response.text)
+                    if redirect_match:
+                        current_url = redirect_match.group(1)
+                        self.logger.info(f"Following redirect to: {current_url}")
+                        redirect_count += 1
+                        
+                        # Small delay to mimic browser behavior
+                        import time
+                        time.sleep(0.5)
+                        continue
+                    else:
+                        self.logger.warning("Could not extract redirect URL from protection page")
+                        break
                 else:
-                    self.logger.warning("Could not extract redirect URL from protection page")
+                    # No more protection pages, return the final response
+                    if redirect_count > 0:
+                        self.logger.info(f"Successfully bypassed InfinityFree protection after {redirect_count} redirects")
+                    return response
             
-            # If no protection detected, return original response
+            # If we hit max redirects, return the last response
+            if redirect_count >= max_redirects:
+                self.logger.warning(f"Hit maximum redirect limit ({max_redirects}), returning last response")
+            
             return response
             
         except Exception as e:
