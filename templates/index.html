@@ -109,7 +109,7 @@
                                     <td>
                                         {% if job.last_run %}
                                             <small class="text-muted">
-                                                {{ moment(job.last_run).format('MMM DD, HH:mm') }}
+                                                {{ job.last_run | format_datetime }}
                                                 {% if job.last_status == 'success' %}
                                                     <i class="bi bi-check-circle text-success"></i>
                                                 {% else %}

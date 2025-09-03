@@ -39,7 +39,7 @@
                                 <tr class="{% if not entry.success %}table-danger{% endif %}">
                                     <td>
                                         <small class="text-muted">
-                                            {{ moment(entry.timestamp).format('MMM DD, YYYY HH:mm:ss') }}
+                                            {{ entry.timestamp | format_datetime('%b %d, %Y %H:%M:%S') }}
                                         </small>
                                     </td>
                                     <td>
@@ -91,7 +91,7 @@
                                                         </div>
                                                         <div class="modal-body">
                                                             <p><strong>Job:</strong> {{ entry.job_name }}</p>
-                                                            <p><strong>Timestamp:</strong> {{ moment(entry.timestamp).format('MMM DD, YYYY HH:mm:ss') }}</p>
+                                                            <p><strong>Timestamp:</strong> {{ entry.timestamp | format_datetime('%b %d, %Y %H:%M:%S') }}</p>
                                                             <p><strong>Error Message:</strong></p>
                                                             <div class="alert alert-danger">
                                                                 <code>{{ entry.error_message }}</code>

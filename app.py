@@ -1,5 +1,6 @@
 import os
 import logging
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from scheduler import CronScheduler
 from job_manager import JobManager
@@ -14,6 +15,19 @@ app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key-change-in-prod
 # Initialize job manager and scheduler
 job_manager = JobManager()
 scheduler = CronScheduler(job_manager)
+
+# Template filter for date formatting
+@app.template_filter('format_datetime')
+def format_datetime(date_string, format='%b %d, %H:%M'):
+    """Format datetime string for display"""
+    try:
+        if isinstance(date_string, str):
+            dt = datetime.fromisoformat(date_string.replace('Z', '+00:00'))
+        else:
+            dt = date_string
+        return dt.strftime(format)
+    except:
+        return date_string
 
 @app.route('/')
 def index():
