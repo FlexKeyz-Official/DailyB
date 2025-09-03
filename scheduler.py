@@ -7,6 +7,7 @@ from apscheduler.executors.pool import ThreadPoolExecutor
 import json
 import re
 from urllib.parse import urlparse, parse_qs
+import time
 
 class CronScheduler:
     def __init__(self, job_manager):
@@ -102,8 +103,42 @@ class CronScheduler:
             self.logger.error(f"Failed to run job {job_id} immediately: {e}")
             return False
     
+    def _extract_and_set_cookie(self, response_text, session):
+        """Extract cookie values from JavaScript and set them in session"""
+        try:
+            # Try to find the simple cookie pattern first
+            simple_cookie_match = re.search(r'document\.cookie="([^"]+)"', response_text)
+            if simple_cookie_match:
+                cookie_string = simple_cookie_match.group(1)
+                # Parse cookie name and value
+                if '=' in cookie_string:
+                    name, value = cookie_string.split('=', 1)
+                    # Remove any additional attributes (path, expires, etc.)
+                    value = value.split(';')[0]
+                    session.cookies.set(name, value, domain='.dailybred.ct.ws')
+                    self.logger.info(f"Set simple cookie: {name}={value}")
+                    return True
+            
+            # Try to extract AES encrypted values
+            hex_pattern_a = re.search(r'toNumbers\("([a-f0-9]+)"\)', response_text)
+            hex_pattern_b = re.search(r'toNumbers\("([a-f0-9]+)"\)', response_text)
+            hex_pattern_c = re.search(r'toNumbers\("([a-f0-9]+)"\)', response_text)
+            
+            if hex_pattern_a and hex_pattern_b and hex_pattern_c:
+                # For now, try a simple approach - set a dummy cookie that might work
+                # This is a fallback since full AES decryption is complex
+                session.cookies.set('__test', 'dummy_value_bypass_attempt', domain='.dailybred.ct.ws')
+                self.logger.info("Set fallback cookie for AES encrypted case")
+                return True
+                
+            return False
+            
+        except Exception as e:
+            self.logger.error(f"Error extracting cookie: {e}")
+            return False
+
     def _handle_infinityfree_protection(self, url, session, headers):
-        """Handle InfinityFree's multi-step anti-bot protection system"""
+        """Handle InfinityFree's multi-step anti-bot protection system with proper cookie handling"""
         try:
             # Update headers to look more like a browser
             browser_headers = headers.copy()
@@ -114,6 +149,8 @@ class CronScheduler:
                 'DNT': '1',
                 'Connection': 'keep-alive',
                 'Upgrade-Insecure-Requests': '1',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache',
             })
             
             current_url = url
@@ -129,6 +166,9 @@ class CronScheduler:
                 if 'aes.js' in response.text and '__test=' in response.text:
                     self.logger.info(f"Detected InfinityFree anti-bot protection (step {redirect_count + 1}), attempting to bypass...")
                     
+                    # Try to extract and set cookies from the JavaScript
+                    self._extract_and_set_cookie(response.text, session)
+                    
                     # Extract the redirect URL from the JavaScript
                     redirect_match = re.search(r'location\.href="([^"]+)"', response.text)
                     if redirect_match:
@@ -137,11 +177,25 @@ class CronScheduler:
                         redirect_count += 1
                         
                         # Small delay to mimic browser behavior
-                        import time
-                        time.sleep(0.5)
+                        time.sleep(1.0)  # Increased delay
                         continue
                     else:
                         self.logger.warning("Could not extract redirect URL from protection page")
+                        break
+                        
+                # Check for cookies not enabled page
+                elif 'Cookies are not enabled' in response.text:
+                    self.logger.warning("Hit cookies not enabled page - protection bypass incomplete")
+                    # Try one more time with different approach
+                    if redirect_count == 0:
+                        # Set a basic cookie and try again
+                        session.cookies.set('__test', 'test_value', domain='.dailybred.ct.ws')
+                        session.cookies.set('__test', 'test_value', domain='dailybred.ct.ws')
+                        self.logger.info("Set basic test cookies and retrying...")
+                        redirect_count += 1
+                        time.sleep(1.0)
+                        continue
+                    else:
                         break
                 else:
                     # No more protection pages, return the final response

@@ -106,5 +106,45 @@
     "success": true,
     "error_message": null,
     "response_content": "<!DOCTYPE html>\n<html>\n<head>\n<title>\n</title>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<style>\nbody {background-color:#ffffff;background-repeat:no-repeat;background-position:top left;background-attachment:fixed;}\nh1{font-family:Arial, sans-serif;color:#000000;background-color:#ffffff;}\np {font-family:Georgia, serif;font-size:14px;font-style:normal;font-weight:normal;color:#000000;background-color:#ffffff;}\n</style>\n</head>\n<body>\n<h1>Cookies are not enabled. </h1>\n<p>It appears your browser is not accepting cookies, please enable cookies to continue to this page, or disable 'private' web browsing mode. </p>\n<p>Instructions to enable cookies for all browsers can be found <a href=\"https://allaboutcookies.org/how-to-manage-cookies\">HERE</a>\n</body>\n</html>\n\n"
+  },
+  {
+    "id": "80af1144-a67e-4fa2-bda1-f5f9198ce128",
+    "job_id": "09ca70b1-cafe-46fd-b421-6b5cf5676ea1",
+    "timestamp": "2025-09-03T13:29:31.027941",
+    "status_code": 200,
+    "execution_time": 2.841,
+    "success": true,
+    "error_message": null,
+    "response_content": "<!DOCTYPE html>\n<html>\n<head>\n<title>\n</title>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<style>\nbody {background-color:#ffffff;background-repeat:no-repeat;background-position:top left;background-attachment:fixed;}\nh1{font-family:Arial, sans-serif;color:#000000;background-color:#ffffff;}\np {font-family:Georgia, serif;font-size:14px;font-style:normal;font-weight:normal;color:#000000;background-color:#ffffff;}\n</style>\n</head>\n<body>\n<h1>Cookies are not enabled. </h1>\n<p>It appears your browser is not accepting cookies, please enable cookies to continue to this page, or disable 'private' web browsing mode. </p>\n<p>Instructions to enable cookies for all browsers can be found <a href=\"https://allaboutcookies.org/how-to-manage-cookies\">HERE</a>\n</body>\n</html>\n\n"
+  },
+  {
+    "id": "01876e90-3d18-4570-b4c0-25dff86f829f",
+    "job_id": "09ca70b1-cafe-46fd-b421-6b5cf5676ea1",
+    "timestamp": "2025-09-03T13:33:10.282288",
+    "status_code": 200,
+    "execution_time": 4.937,
+    "success": true,
+    "error_message": null,
+    "response_content": "<!DOCTYPE html>\n<html>\n<head>\n<title>\n</title>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<style>\nbody {background-color:#ffffff;background-repeat:no-repeat;background-position:top left;background-attachment:fixed;}\nh1{font-family:Arial, sans-serif;color:#000000;background-color:#ffffff;}\np {font-family:Georgia, serif;font-size:14px;font-style:normal;font-weight:normal;color:#000000;background-color:#ffffff;}\n</style>\n</head>\n<body>\n<h1>Cookies are not enabled. </h1>\n<p>It appears your browser is not accepting cookies, please enable cookies to continue to this page, or disable 'private' web browsing mode. </p>\n<p>Instructions to enable cookies for all browsers can be found <a href=\"https://allaboutcookies.org/how-to-manage-cookies\">HERE</a>\n</body>\n</html>\n\n"
+  },
+  {
+    "id": "8010d928-16a3-4fa5-b1cb-d13a58e7abcf",
+    "job_id": "09ca70b1-cafe-46fd-b421-6b5cf5676ea1",
+    "timestamp": "2025-09-03T13:33:15.238791",
+    "status_code": 200,
+    "execution_time": 4.953,
+    "success": true,
+    "error_message": null,
+    "response_content": "<!DOCTYPE html>\n<html>\n<head>\n<title>\n</title>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<style>\nbody {background-color:#ffffff;background-repeat:no-repeat;background-position:top left;background-attachment:fixed;}\nh1{font-family:Arial, sans-serif;color:#000000;background-color:#ffffff;}\np {font-family:Georgia, serif;font-size:14px;font-style:normal;font-weight:normal;color:#000000;background-color:#ffffff;}\n</style>\n</head>\n<body>\n<h1>Cookies are not enabled. </h1>\n<p>It appears your browser is not accepting cookies, please enable cookies to continue to this page, or disable 'private' web browsing mode. </p>\n<p>Instructions to enable cookies for all browsers can be found <a href=\"https://allaboutcookies.org/how-to-manage-cookies\">HERE</a>\n</body>\n</html>\n\n"
+  },
+  {
+    "id": "c3ef3aed-6171-432f-9150-94cee5cb336b",
+    "job_id": "09ca70b1-cafe-46fd-b421-6b5cf5676ea1",
+    "timestamp": "2025-09-03T13:33:21.233442",
+    "status_code": 200,
+    "execution_time": 4.853,
+    "success": true,
+    "error_message": null,
+    "response_content": "<!DOCTYPE html>\n<html>\n<head>\n<title>\n</title>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<style>\nbody {background-color:#ffffff;background-repeat:no-repeat;background-position:top left;background-attachment:fixed;}\nh1{font-family:Arial, sans-serif;color:#000000;background-color:#ffffff;}\np {font-family:Georgia, serif;font-size:14px;font-style:normal;font-weight:normal;color:#000000;background-color:#ffffff;}\n</style>\n</head>\n<body>\n<h1>Cookies are not enabled. </h1>\n<p>It appears your browser is not accepting cookies, please enable cookies to continue to this page, or disable 'private' web browsing mode. </p>\n<p>Instructions to enable cookies for all browsers can be found <a href=\"https://allaboutcookies.org/how-to-manage-cookies\">HERE</a>\n</body>\n</html>\n\n"
   }
 ]
