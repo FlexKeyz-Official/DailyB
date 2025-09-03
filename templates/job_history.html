@@ -31,6 +31,7 @@
                                     <th>Status</th>
                                     <th>HTTP Code</th>
                                     <th>Execution Time</th>
+                                    <th>Response</th>
                                     <th>Details</th>
                                 </tr>
                             </thead>
@@ -71,6 +72,41 @@
                                     </td>
                                     <td>
                                         <span class="text-muted">{{ entry.execution_time }}s</span>
+                                    </td>
+                                    <td>
+                                        {% if entry.response_content %}
+                                            <button class="btn btn-sm btn-outline-success" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#responseModal{{ loop.index }}"
+                                                    title="View Response">
+                                                <i class="bi bi-file-text"></i>
+                                            </button>
+                                            
+                                            <!-- Response Modal -->
+                                            <div class="modal fade" id="responseModal{{ loop.index }}" tabindex="-1">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Response Content</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p><strong>Job:</strong> {{ entry.job_name }}</p>
+                                                            <p><strong>Timestamp:</strong> {{ entry.timestamp | format_datetime('%b %d, %Y %H:%M:%S') }}</p>
+                                                            <p><strong>Response:</strong></p>
+                                                            <div class="alert alert-info">
+                                                                <pre style="white-space: pre-wrap; margin: 0;"><code>{{ entry.response_content }}</code></pre>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         {% if entry.error_message %}

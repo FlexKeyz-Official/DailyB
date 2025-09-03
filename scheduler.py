@@ -155,7 +155,8 @@ class CronScheduler:
                 status_code=response.status_code,
                 execution_time=execution_time,
                 success=success,
-                error_message=None if success else f"HTTP {response.status_code}: {response.text[:200]}"
+                error_message=None if success else f"HTTP {response.status_code}: {response.text[:200]}",
+                response_content=response.text if success else None
             )
             
             return success
@@ -171,7 +172,8 @@ class CronScheduler:
                 status_code=None,
                 execution_time=execution_time,
                 success=False,
-                error_message=error_message
+                error_message=error_message,
+                response_content=None
             )
             
             return False
@@ -187,7 +189,8 @@ class CronScheduler:
                 status_code=None,
                 execution_time=execution_time,
                 success=False,
-                error_message=error_message
+                error_message=error_message,
+                response_content=None
             )
             
             return False

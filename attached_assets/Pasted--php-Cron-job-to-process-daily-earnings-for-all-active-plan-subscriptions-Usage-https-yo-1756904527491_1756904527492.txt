@@ -1,0 +1,90 @@
+<?php
+// Cron job to process daily earnings for all active plan subscriptions
+// Usage: https://yourdomain.com/crons/cron_earnings.php?token=YOUR_SECRET_KEY
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+header('Content-Type: application/json');
+
+require_once __DIR__ . '/../config/db.php';
+
+// ---------------- Security Check ----------------
+$secret = "adminFlex01"; // <-- change this to a strong unique key
+if (!isset($_GET['token']) || $_GET['token'] !== $secret) {
+    http_response_code(403);
+    echo json_encode([
+        "success" => false,
+        "error" => "Unauthorized access"
+    ]);
+    exit;
+}
+// ------------------------------------------------
+
+$response = [];
+
+try {
+    // 1. Get all active user plans that have not ended
+    $subs = $pdo->query("
+        SELECT up.id AS subscription_id, up.user_id, up.end_date, p.daily_return
+        FROM user_plans up
+        JOIN plans p ON up.plan_id = p.id
+        WHERE up.active = 1 AND up.end_date >= CURDATE()
+    ");
+
+    if (!$subs) {
+        throw new Exception('Failed to fetch active subscriptions.');
+    }
+
+    $count = 0;
+    while ($row = $subs->fetch(PDO::FETCH_ASSOC)) {
+        $user_id = $row['user_id'];
+        $amount = (float)$row['daily_return'];
+        $subscription_id = $row['subscription_id'];
+
+        // 2. Insert transaction as daily earning (if not already given today)
+        $ref = json_encode(['subscription_id' => $subscription_id], JSON_UNESCAPED_SLASHES);
+        $check = $pdo->prepare("
+            SELECT COUNT(*) 
+            FROM transactions 
+            WHERE user_id = ? 
+              AND type = 'earning' 
+              AND DATE(created_at) = CURDATE() 
+              AND reference = ?
+        ");
+        $check->execute([$user_id, $ref]);
+
+        if ($check->fetchColumn() == 0) {
+            $ins = $pdo->prepare("
+                INSERT INTO transactions 
+                (user_id, type, amount, status, created_at, reference) 
+                VALUES (?, 'earning', ?, 'completed', NOW(), ?)
+            ");
+            $ins->execute([$user_id, $amount, $ref]);
+            // Also insert into earnings table
+            $earn = $pdo->prepare("
+                INSERT INTO earnings (user_plan_id, amount, earned_on, commissions)
+                VALUES (?, ?, CURDATE(), 0.00)
+            ");
+            $earn->execute([$subscription_id, $amount]);
+            $count++;
+        }
+
+        // 3. Auto-deactivate if end date has passed
+        if (strtotime($row['end_date']) < strtotime(date('Y-m-d'))) {
+            $pdo->prepare("UPDATE user_plans SET active = 0 WHERE id = ?")
+                ->execute([$subscription_id]);
+        }
+    }
+
+    $response['success'] = true;
+    $response['message'] = "Daily earnings processed successfully.";
+    $response['credited'] = $count;
+
+} catch (Exception $e) {
+    $response['success'] = false;
+    $response['error'] = $e->getMessage();
+}
+
+echo json_encode($response, JSON_PRETTY_PRINT);

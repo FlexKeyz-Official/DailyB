@@ -123,7 +123,7 @@ class JobManager:
                 break
         self._save_jobs(jobs)
     
-    def add_execution_history(self, job_id, status_code, execution_time, success, error_message=None):
+    def add_execution_history(self, job_id, status_code, execution_time, success, error_message=None, response_content=None):
         """Add an execution record to history"""
         history = self._load_history()
         
@@ -137,7 +137,8 @@ class JobManager:
             'status_code': status_code,
             'execution_time': round(execution_time, 3),
             'success': success,
-            'error_message': error_message
+            'error_message': error_message,
+            'response_content': response_content[:1000] if response_content else None  # Limit to 1000 chars
         }
         
         history.append(record)
