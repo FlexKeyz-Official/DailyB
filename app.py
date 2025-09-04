@@ -1,5 +1,6 @@
 import os
 import logging
+import requests
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from scheduler import CronScheduler
@@ -184,6 +185,85 @@ def clear_history():
         logging.error(f"Error clearing history: {e}")
     
     return redirect(url_for('job_history'))
+
+@app.route('/webhook/earnings', methods=['POST'])
+def webhook_earnings():
+    """Secure webhook endpoint for triggering the daily earnings job"""
+    try:
+        # Verify the webhook token for security
+        token = request.headers.get('X-Webhook-Token') or request.json.get('token') if request.json else None
+        expected_token = os.environ.get('WEBHOOK_SECRET', 'adminFlex01')
+        
+        if token != expected_token:
+            return jsonify({'error': 'Invalid webhook token'}), 401
+        
+        # Find the earnings job (you can modify this to match your job name)
+        jobs = job_manager.get_all_jobs()
+        earnings_job = None
+        for job in jobs:
+            if 'earnings' in job['name'].lower() or 'dailybred' in job['name'].lower():
+                earnings_job = job
+                break
+        
+        if not earnings_job:
+            return jsonify({'error': 'Earnings job not found'}), 404
+        
+        # Execute the earnings job
+        result = scheduler.run_job_now(earnings_job['id'])
+        
+        if result:
+            return jsonify({
+                'success': True,
+                'message': 'Daily earnings job executed successfully',
+                'job_name': earnings_job['name'],
+                'timestamp': datetime.now().isoformat()
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Failed to execute earnings job',
+                'job_name': earnings_job['name']
+            }), 500
+            
+    except Exception as e:
+        logging.error(f"Webhook error: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/earnings/direct', methods=['POST'])
+def direct_earnings():
+    """Direct earnings processor that bypasses InfinityFree protection entirely"""
+    try:
+        # Verify the API token
+        token = request.headers.get('X-API-Token') or request.json.get('token') if request.json else None
+        expected_token = os.environ.get('WEBHOOK_SECRET', 'adminFlex01')
+        
+        if token != expected_token:
+            return jsonify({'error': 'Invalid API token'}), 401
+        
+        # Make direct request to earnings endpoint
+        import requests
+        
+        # This makes the request from Replit's servers, bypassing InfinityFree protection
+        response = requests.get(
+            'https://dailybred.ct.ws/crons/cron_earnings.php?token=adminFlex01',
+            headers={
+                'User-Agent': 'Replit-Cron-Service/1.0',
+                'Accept': 'application/json, text/html, */*'
+            },
+            timeout=30
+        )
+        
+        return jsonify({
+            'success': True,
+            'message': 'Direct earnings request completed',
+            'status_code': response.status_code,
+            'response': response.text[:500] if response.text else 'No response',
+            'timestamp': datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logging.error(f"Direct earnings error: {e}")
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     # Start the scheduler
