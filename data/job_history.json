@@ -256,5 +256,15 @@
     "success": true,
     "error_message": null,
     "response_content": "<!DOCTYPE html>\n<html>\n<head>\n<title>\n</title>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<style>\nbody {background-color:#ffffff;background-repeat:no-repeat;background-position:top left;background-attachment:fixed;}\nh1{font-family:Arial, sans-serif;color:#000000;background-color:#ffffff;}\np {font-family:Georgia, serif;font-size:14px;font-style:normal;font-weight:normal;color:#000000;background-color:#ffffff;}\n</style>\n</head>\n<body>\n<h1>Cookies are not enabled. </h1>\n<p>It appears your browser is not accepting cookies, please enable cookies to continue to this page, or disable 'private' web browsing mode. </p>\n<p>Instructions to enable cookies for all browsers can be found <a href=\"https://allaboutcookies.org/how-to-manage-cookies\">HERE</a>\n</body>\n</html>\n\n"
+  },
+  {
+    "id": "99a75081-7468-459e-9b9e-f96af910a9e5",
+    "job_id": "09ca70b1-cafe-46fd-b421-6b5cf5676ea1",
+    "timestamp": "2025-09-04T00:47:15.879151",
+    "status_code": 200,
+    "execution_time": 4.85,
+    "success": true,
+    "error_message": null,
+    "response_content": "<!DOCTYPE html>\n<html>\n<head>\n<title>\n</title>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<style>\nbody {background-color:#ffffff;background-repeat:no-repeat;background-position:top left;background-attachment:fixed;}\nh1{font-family:Arial, sans-serif;color:#000000;background-color:#ffffff;}\np {font-family:Georgia, serif;font-size:14px;font-style:normal;font-weight:normal;color:#000000;background-color:#ffffff;}\n</style>\n</head>\n<body>\n<h1>Cookies are not enabled. </h1>\n<p>It appears your browser is not accepting cookies, please enable cookies to continue to this page, or disable 'private' web browsing mode. </p>\n<p>Instructions to enable cookies for all browsers can be found <a href=\"https://allaboutcookies.org/how-to-manage-cookies\">HERE</a>\n</body>\n</html>\n\n"
   }
 ]
