@@ -8,6 +8,10 @@ import json
 import re
 from urllib.parse import urlparse, parse_qs
 import time
+import base64
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+import binascii
 
 class CronScheduler:
     def __init__(self, job_manager):
@@ -103,6 +107,37 @@ class CronScheduler:
             self.logger.error(f"Failed to run job {job_id} immediately: {e}")
             return False
     
+    def _hex_to_bytes(self, hex_string):
+        """Convert hex string to bytes"""
+        try:
+            return bytes.fromhex(hex_string)
+        except ValueError:
+            return None
+
+    def _decrypt_aes(self, encrypted_hex, key_hex, iv_hex):
+        """Decrypt AES encrypted data"""
+        try:
+            # Convert hex strings to bytes
+            encrypted_data = self._hex_to_bytes(encrypted_hex)
+            key = self._hex_to_bytes(key_hex)
+            iv = self._hex_to_bytes(iv_hex)
+            
+            if not all([encrypted_data, key, iv]):
+                return None
+                
+            # Create AES cipher in CBC mode
+            cipher = AES.new(key, AES.MODE_CBC, iv)
+            
+            # Decrypt and remove padding
+            decrypted = cipher.decrypt(encrypted_data)
+            decrypted = unpad(decrypted, AES.block_size)
+            
+            return decrypted.decode('utf-8')
+            
+        except Exception as e:
+            self.logger.error(f"AES decryption failed: {e}")
+            return None
+
     def _extract_and_set_cookie(self, response_text, session):
         """Extract cookie values from JavaScript and set them in session"""
         try:
@@ -119,16 +154,49 @@ class CronScheduler:
                     self.logger.info(f"Set simple cookie: {name}={value}")
                     return True
             
-            # Try to extract AES encrypted values
-            hex_pattern_a = re.search(r'toNumbers\("([a-f0-9]+)"\)', response_text)
-            hex_pattern_b = re.search(r'toNumbers\("([a-f0-9]+)"\)', response_text)
-            hex_pattern_c = re.search(r'toNumbers\("([a-f0-9]+)"\)', response_text)
+            # Try to extract AES encrypted values - more comprehensive approach
+            hex_patterns = re.findall(r'toNumbers\("([a-f0-9]+)"\)', response_text)
+            if len(hex_patterns) >= 3:
+                self.logger.info(f"Found {len(hex_patterns)} hex patterns for AES decryption")
+                
+                # Try different combinations of the hex values as key, IV, and encrypted data
+                for i in range(len(hex_patterns)):
+                    for j in range(len(hex_patterns)):
+                        for k in range(len(hex_patterns)):
+                            if i != j and j != k and i != k:
+                                try:
+                                    decrypted = self._decrypt_aes(hex_patterns[i], hex_patterns[j], hex_patterns[k])
+                                    if decrypted:
+                                        self.logger.info(f"Successfully decrypted AES value: {decrypted}")
+                                        session.cookies.set('__test', decrypted, domain='.dailybred.ct.ws')
+                                        session.cookies.set('__test', decrypted, domain='dailybred.ct.ws')
+                                        return True
+                                except:
+                                    continue
             
-            if hex_pattern_a and hex_pattern_b and hex_pattern_c:
-                # For now, try a simple approach - set a dummy cookie that might work
-                # This is a fallback since full AES decryption is complex
-                session.cookies.set('__test', 'dummy_value_bypass_attempt', domain='.dailybred.ct.ws')
-                self.logger.info("Set fallback cookie for AES encrypted case")
+            # Try to find direct cookie assignments in JavaScript
+            js_cookie_patterns = [
+                r'document\.cookie\s*=\s*["\']([^"\']+)["\']',
+                r'cookie\s*=\s*["\']([^"\']+)["\']',
+                r'__test["\']?\s*=\s*["\']([^"\']+)["\']'
+            ]
+            
+            for pattern in js_cookie_patterns:
+                matches = re.findall(pattern, response_text, re.IGNORECASE)
+                for match in matches:
+                    if '=' in match:
+                        name, value = match.split('=', 1)
+                        session.cookies.set(name.strip(), value.split(';')[0].strip(), domain='.dailybred.ct.ws')
+                        self.logger.info(f"Set JS extracted cookie: {name.strip()}={value.split(';')[0].strip()}")
+                        return True
+            
+            # As a last resort, try to generate a plausible cookie value
+            if hex_patterns:
+                # Use the first hex pattern as a potential cookie value
+                test_value = hex_patterns[0][:32]  # Take first 32 chars as cookie value
+                session.cookies.set('__test', test_value, domain='.dailybred.ct.ws')
+                session.cookies.set('__test', test_value, domain='dailybred.ct.ws')
+                self.logger.info(f"Set fallback hex cookie: __test={test_value}")
                 return True
                 
             return False
