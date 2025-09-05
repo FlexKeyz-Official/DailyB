@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "id": "51665990-93bd-417a-838f-8459460b87f3",
+    "name": "DailyBred",
+    "url": "https://dailybred.ct.ws/crons/cron_earnings.php",
+    "cron_expression": "0 * * * *",
+    "method": "GET",
+    "headers": {},
+    "payload": null,
+    "active": true,
+    "created_at": "2025-09-05T00:23:36.024195",
+    "last_run": "2025-09-05T01:06:23.156310",
+    "last_status": "success"
+  }
+]
