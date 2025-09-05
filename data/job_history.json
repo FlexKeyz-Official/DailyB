@@ -266,5 +266,65 @@
     "success": true,
     "error_message": null,
     "response_content": "<!DOCTYPE html>\n<html>\n<head>\n<title>\n</title>\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<style>\nbody {background-color:#ffffff;background-repeat:no-repeat;background-position:top left;background-attachment:fixed;}\nh1{font-family:Arial, sans-serif;color:#000000;background-color:#ffffff;}\np {font-family:Georgia, serif;font-size:14px;font-style:normal;font-weight:normal;color:#000000;background-color:#ffffff;}\n</style>\n</head>\n<body>\n<h1>Cookies are not enabled. </h1>\n<p>It appears your browser is not accepting cookies, please enable cookies to continue to this page, or disable 'private' web browsing mode. </p>\n<p>Instructions to enable cookies for all browsers can be found <a href=\"https://allaboutcookies.org/how-to-manage-cookies\">HERE</a>\n</body>\n</html>\n\n"
+  },
+  {
+    "id": "626ae869-44a4-4571-b44b-91647969907b",
+    "job_id": "eb0fa596-b580-41f8-89fe-02f2a93f3aeb",
+    "timestamp": "2025-09-04T16:45:30.139019",
+    "status_code": 200,
+    "execution_time": 0.392,
+    "success": true,
+    "error_message": null,
+    "response_content": "{\"success\":true,\"message\":\"Cron started. Processing in background.\"}"
+  },
+  {
+    "id": "69900876-a762-4acd-acde-a7e2d8d80668",
+    "job_id": "eb0fa596-b580-41f8-89fe-02f2a93f3aeb",
+    "timestamp": "2025-09-04T17:24:21.551801",
+    "status_code": 200,
+    "execution_time": 0.377,
+    "success": true,
+    "error_message": null,
+    "response_content": "{\"success\":true,\"message\":\"Cron started. Processing in background.\"}"
+  },
+  {
+    "id": "116b75dd-4d61-456b-8f5d-219940fe56f8",
+    "job_id": "eb0fa596-b580-41f8-89fe-02f2a93f3aeb",
+    "timestamp": "2025-09-04T17:31:53.774896",
+    "status_code": 200,
+    "execution_time": 0.347,
+    "success": true,
+    "error_message": null,
+    "response_content": "{\"success\":true,\"message\":\"Cron started. Processing in background.\"}"
+  },
+  {
+    "id": "395d2fd3-a850-499c-af63-ddade6b3f613",
+    "job_id": "eb0fa596-b580-41f8-89fe-02f2a93f3aeb",
+    "timestamp": "2025-09-05T00:09:38.472137",
+    "status_code": 200,
+    "execution_time": 0.389,
+    "success": true,
+    "error_message": null,
+    "response_content": "{\"success\":true,\"message\":\"Cron started. Processing in background.\"}"
+  },
+  {
+    "id": "b33d3425-d768-4383-bd85-a3db13ae1f71",
+    "job_id": "eb0fa596-b580-41f8-89fe-02f2a93f3aeb",
+    "timestamp": "2025-09-05T00:16:48.086381",
+    "status_code": 200,
+    "execution_time": 0.414,
+    "success": true,
+    "error_message": null,
+    "response_content": "{\"success\":true,\"message\":\"Cron started. Processing in background.\"}"
+  },
+  {
+    "id": "8fbdf462-990a-49a5-9837-01ffb5f2f79e",
+    "job_id": "eb0fa596-b580-41f8-89fe-02f2a93f3aeb",
+    "timestamp": "2025-09-05T00:17:28.651438",
+    "status_code": 200,
+    "execution_time": 0.348,
+    "success": true,
+    "error_message": null,
+    "response_content": "{\"success\":true,\"message\":\"Cron started. Processing in background.\"}"
   }
 ]
